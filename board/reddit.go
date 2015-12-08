@@ -5,7 +5,6 @@ import (
 	"time"
 	"strconv"
 	"io"
-	"io/ioutil"
 )
 
 type Reddit struct {
@@ -34,29 +33,27 @@ func (s *Reddit) ReadBoard(b *Board, rc io.Reader) (<-chan *Thread) {
 	out := make(chan *Thread)
 	go func() {
 		defer close(out)
-		body, err := ioutil.ReadAll(rc)
+		rcs, err := dupReader(rc)
 		if err != nil {
 			return
 		}
-		body_s := string(body)
 
-		rc1 := strings.NewReader(body_s)
-		r1 := recsFromClasses(rc1, [][2]string {
-			{"title may-blank", ""},
-			{"live-timestamp", "title"},
-			{"author may-blank", ""},
-			{"comments may-blank", ""},
-		})
-		// to get the site key ugh
-		rc2 := strings.NewReader(body_s)
-		r2 := recsFromClasses(
-			rc2, [][2]string{{"comments may-blank", "href"}})
+		recc := [2]<-chan []string{
+			recsFromClasses(rcs[0], [][2]string {
+				{"title may-blank", ""},
+				{"live-timestamp", "title"},
+				{"author may-blank", ""},
+				{"comments may-blank", ""},}),
+			// to get the site key ugh
+			recsFromClasses(rcs[1], [][2]string {
+				{"comments may-blank", "href"},}),
+		}
 		for {
-			rec1, r1_ok := <-r1
-			rec2, r2_ok := <-r2
-			if r1_ok && r2_ok {
+			rec1, r0_ok := <-recc[0]
+			rec2, r1_ok := <-recc[1]
+			if r0_ok && r1_ok {
 				out <- s.rec2thr(b, append(rec1, rec2...))
-			} else if !r1_ok && !r2_ok {
+			} else if !r0_ok && !r1_ok {
 				return
 			}
 		}

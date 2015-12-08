@@ -1,10 +1,11 @@
 package board
 
 import (
-	"log"
-	"strings"
+	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
+	"strings"
 	"net/http"
 	"golang.org/x/net/html"
 )
@@ -32,6 +33,17 @@ func httpReader(url string) (io.Reader, error) {
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	return strings.NewReader(string(body)), err
+}
+
+
+func dupReader(rc io.Reader) (rcs [2]io.Reader, _ error) {
+	body, err := ioutil.ReadAll(rc)
+	if err != nil {
+		return rcs, err
+	}
+	body_s := string(body)
+	rcs[0], rcs[1] = strings.NewReader(body_s), strings.NewReader(body_s)
+	return rcs, nil
 }
 
 func recsFromClasses(rc io.Reader, matchClasses [][2]string)  <-chan []string {
@@ -96,17 +108,28 @@ func isClassMatch(n *html.Node, cls string) bool {
 }
 
 func findAttr(n *html.Node, attr string) (ret string) {
-	if attr == "" {
+	switch {
+	case attr == "":
 		for nn := range newNodeChan(n) {
 			if nn.Type == html.TextNode {
 				ret = ret + nn.Data + "\n"
 			}
 		}
 		return strings.Trim(ret, "\n")
-	}
-	for i := range n.Attr {
-		if n.Attr[i].Key == attr {
-			return n.Attr[i].Val
+	case attr == "attrs":
+		for nn := range newNodeChan(n) {
+			for i := range nn.Attr {
+				ret += fmt.Sprintf("%s=\"%s\" ",
+					nn.Attr[i].Key, nn.Attr[i].Val)
+			}
+		}
+		return ret
+	default:
+		// find matching attr
+		for i := range n.Attr {
+			if n.Attr[i].Key == attr {
+				return n.Attr[i].Val
+			}
 		}
 	}
 	return ret

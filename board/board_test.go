@@ -2,6 +2,7 @@ package board
 
 import (
 	"testing"
+	"time"
 	"os"
 )
 
@@ -15,7 +16,7 @@ func doTestRefreshBoard(t *testing.T, s *Site, fname string, expected_c uint) {
 	thrs := s.ReadBoard(s.Open("abc"), rc)
 	t_c := uint(0)
 	for thr := range thrs {
-		if thr.when.Year() != 2015 {
+		if thr.when.Year() < 2015 {
 			t.Error("Bad year on ", *thr)
 		}
 		t_c++
@@ -35,10 +36,10 @@ func doTestRefreshThread(t *testing.T, s *Site, fname string) {
 		return
 	}
 
-	thr := newThread(nil, &Comment{}, nil)
+	thr := newThread(nil, &Comment{ when : time.Now() }, nil)
 	c_c := 0
 	for c := range s.Browser.ReadThread(thr, rc) {
-		if c.when.Year() != 2015 {
+		if c.when.Year() < 2015 {
 			t.Error("Bad year on ", *c)
 		}
 		c_c++
