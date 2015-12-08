@@ -27,6 +27,8 @@ func NewSite(name string) (s *Site) {
 		s = newRedditSite()
 	case name == "4chan":
 		s = newFourChanSite()
+	case name == "slashdot":
+		s = newSlashdotSite()
 	}
 
 	if s != nil {
