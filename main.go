@@ -1,12 +1,15 @@
 package main
+
 import (
 	"fmt"
 	"log"
 	"os"
 	"os/signal"
+
 	"github.com/hanwen/go-fuse/fuse"
 	"github.com/hanwen/go-fuse/fuse/nodefs"
-	"./boardfs"
+
+	"github.com/chzchzchz/goboardfs/boardfs"
 )
 
 func main() {

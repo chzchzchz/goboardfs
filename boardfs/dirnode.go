@@ -1,14 +1,15 @@
 package boardfs
 
 import (
-	"github.com/hanwen/go-fuse/fuse/nodefs"
-	"github.com/hanwen/go-fuse/fuse"
 	"log"
 	"os/user"
-	"strings"
 	"strconv"
+	"strings"
 	"syscall"
 	"time"
+
+	"github.com/hanwen/go-fuse/fuse"
+	"github.com/hanwen/go-fuse/fuse/nodefs"
 )
 
 type NodeMaker interface {
@@ -19,15 +20,15 @@ type NodeMaker interface {
 type DirNode struct {
 	nodefs.Node
 	NodeMaker
-	time	time.Time
-	owner	fuse.Owner
+	time  time.Time
+	owner fuse.Owner
 }
 
 var (
 	defaultOwner *fuse.Owner
 )
 
-func isBadName(name string)  bool {
+func isBadName(name string) bool {
 	// XXX hack to avoid apache freakouts since lookups may be too permissive
 	return name == ".htaccess" ||
 		strings.Contains(name, ".htm") ||
@@ -48,13 +49,13 @@ func newDirNode(o *fuse.Owner, t *time.Time, nm NodeMaker) (dn *DirNode) {
 		t = &now
 	}
 	return &DirNode{
-		Node : nodefs.NewDefaultNode(),
-		NodeMaker : nm,
-		time : *t,
-		owner : *o}
+		Node:      nodefs.NewDefaultNode(),
+		NodeMaker: nm,
+		time:      *t,
+		owner:     *o}
 }
 
-func getDefaultOwner() (*fuse.Owner) {
+func getDefaultOwner() *fuse.Owner {
 	if defaultOwner != nil {
 		return defaultOwner
 	}
@@ -70,7 +71,7 @@ func getDefaultOwner() (*fuse.Owner) {
 	if err != nil {
 		log.Fatalf("Couldn't convert gid %v", err)
 	}
-	defaultOwner = &fuse.Owner{Uid : uint32(uid), Gid : uint32(gid)}
+	defaultOwner = &fuse.Owner{Uid: uint32(uid), Gid: uint32(gid)}
 	return defaultOwner
 }
 
@@ -94,7 +95,7 @@ func (dn *DirNode) Mkdir(
 	if isBadName(name) {
 		return nil, fuse.ENOENT
 	}
-	n, err:= dn.NodeFromName(name)
+	n, err := dn.NodeFromName(name)
 	if err != nil {
 		return nil, fuse.ENOENT
 	}
@@ -105,7 +106,7 @@ func (dn *DirNode) Lookup(
 	out *fuse.Attr,
 	name string,
 	context *fuse.Context) (*nodefs.Inode, fuse.Status) {
-	if (isBadName(name)) {
+	if isBadName(name) {
 		return nil, fuse.ENOENT
 	}
 

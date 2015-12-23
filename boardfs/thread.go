@@ -1,10 +1,12 @@
 package boardfs
 
 import (
-	"github.com/hanwen/go-fuse/fuse/nodefs"
-	"github.com/hanwen/go-fuse/fuse"
-	"../board"
 	"syscall"
+
+	"github.com/hanwen/go-fuse/fuse"
+	"github.com/hanwen/go-fuse/fuse/nodefs"
+
+	"github.com/chzchzchz/goboardfs/board"
 )
 
 type ThreadNode struct {
