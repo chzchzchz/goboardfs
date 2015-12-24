@@ -50,3 +50,30 @@ func doTestRefreshThread(t *testing.T, s *Site, fname string) {
 		return
 	}
 }
+
+
+func TestRefreshBoard(t *testing.T) {
+	tests := []struct {
+		name string
+		boardTotal uint
+	}{
+		{"4chan", 15},
+		{"hackernews", 30},
+		{"reddit", 25},
+		{"slashdot", 15},
+	}
+	for i := range tests  {
+		test := &tests[i]
+		t.Log("Testing...", test.name)
+		doTestRefreshBoard(
+			t, NewSite(test.name), test.name, test.boardTotal)
+	}
+}
+
+func TestRefreshThread(t *testing.T) {
+	sites := Sites()
+	for i := range sites {
+		t.Log("Testing...", sites[i])
+		doTestRefreshThread(t, NewSite(sites[i]), sites[i])
+	}
+}
