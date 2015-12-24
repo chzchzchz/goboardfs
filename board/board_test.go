@@ -58,6 +58,7 @@ func TestRefreshBoard(t *testing.T) {
 		boardTotal uint
 	}{
 		{"4chan", 15},
+		{"backpage", 100},
 		{"hackernews", 30},
 		{"reddit", 25},
 		{"slashdot", 15},

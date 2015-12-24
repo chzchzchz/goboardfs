@@ -28,6 +28,7 @@ type siteInfo struct {
 var (
 	sites = []siteInfo{
 		siteInfo{name: "4chan", init: newFourChanSite},
+		siteInfo{name: "backpage", init: newBackpageSite},
 		siteInfo{name: "hackernews", init: newHackerNewsSite},
 		siteInfo{name: "reddit", init: newRedditSite},
 		siteInfo{name: "slashdot", init: newSlashdotSite},

@@ -32,7 +32,7 @@ func (b *Board) Read() []*Thread {
 
 	rc, err := b.site.OpenBoardReader(b)
 	if err != nil {
-		log.Println("Error reading ", err)
+		log.Printf("error reading (%v)", err)
 		return b.threads
 	}
 

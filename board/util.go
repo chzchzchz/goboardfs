@@ -35,15 +35,22 @@ func httpReader(url string) (io.Reader, error) {
 	return strings.NewReader(string(body)), err
 }
 
-func dupReader(rc io.Reader) (rcs [2]io.Reader, _ error) {
+func dupReader(rc io.Reader) (rcs []io.Reader, err error) {
+	return dupReaderN(rc, 2)
+}
+
+func dupReaderN(rc io.Reader, n int) (rcs []io.Reader, _ error) {
 	body, err := ioutil.ReadAll(rc)
 	if err != nil {
 		return rcs, err
 	}
 	body_s := string(body)
-	rcs[0], rcs[1] = strings.NewReader(body_s), strings.NewReader(body_s)
+	for i := 0; i < n; i++ {
+		rcs = append(rcs, strings.NewReader(body_s))
+	}
 	return rcs, nil
 }
+
 
 func recsFromClasses(rc io.Reader, matchClasses [][2]string) <-chan []string {
 	out, err := newRecChan(rc, matchClasses)
