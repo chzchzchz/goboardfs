@@ -1,10 +1,12 @@
 package boardfs
 
 import (
-	"github.com/hanwen/go-fuse/fuse/nodefs"
-	"../board"
-	"log"
 	"errors"
+	"log"
+
+	"github.com/hanwen/go-fuse/fuse/nodefs"
+
+	"github.com/chzchzchz/goboardfs/board"
 )
 
 type BoardNode struct {
@@ -26,6 +28,6 @@ func (bn *BoardNode) NodeFromName(name string) (nodefs.Node, error) {
 		return nil, errors.New("could not open threads")
 	}
 	return &ThreadNode{
-		Node : nodefs.NewDefaultNode(),
-		thread : t}, nil
+		Node:   nodefs.NewDefaultNode(),
+		thread: t}, nil
 }
