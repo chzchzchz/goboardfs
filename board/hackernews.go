@@ -65,7 +65,9 @@ func (s *HackerNews) ReadBoard(b *Board, rc io.Reader) <-chan *Thread {
 			{"subtext", ""},
 		}) {
 			if rec1, ok := <-rec1c; ok {
-				out <- s.rec2thr(b, append(rec0, rec1...))
+				if thr := s.rec2thr(b, append(rec0, rec1...)); thr != nil {
+					out <- thr
+				}
 			}
 		}
 		close(out)
@@ -80,7 +82,11 @@ func (s *HackerNews) rec2thr(b *Board, rec []string) *Thread {
 	hour_dur := time.Duration(time.Duration(num_hours) * time.Hour)
 	when := time.Now().Add(-hour_dur)
 	// item?id=123345356
-	site_key := strings.Split(strings.Split(rec[4], " ")[5], "\"")[1]
+	key_blob := strings.Split(rec[4], " ")
+	if len(key_blob) <= 5 {
+		return nil
+	}
+	site_key := strings.Split(key_blob[5], "\"")[1]
 	comm := &Comment{
 		author:   subtext[11],
 		title:    strings.Split(rec[1], "\n")[0],
