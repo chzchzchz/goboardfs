@@ -2,10 +2,10 @@ package board
 
 import (
 	"io"
+	"log"
 	"strconv"
 	"strings"
 	"time"
-	"log"
 )
 
 type HackerNews struct {
@@ -23,7 +23,7 @@ func (s *HackerNews) BoardDirectory() []string {
 }
 
 func (s *HackerNews) OpenBoardReader(b *Board) (io.Reader, error) {
-	return httpReader("http://news.ycombinator.com/")// + b.name)
+	return httpReader("http://news.ycombinator.com/") // + b.name)
 }
 
 func (s *HackerNews) OpenThreadReader(t *Thread) (io.Reader, error) {
@@ -36,8 +36,8 @@ func (s *HackerNews) ReadThread(t *Thread, rc io.Reader) <-chan *Comment {
 	go func() {
 		for rec := range recsFromClasses(rc, [][2]string{
 			{"ind", ""},
-			{"comhead", ""}, // user, time
-			{"c00", ""}, // comment
+			{"comhead", ""},    // user, time
+			{"c00", ""},        // comment
 			{"reply", "attrs"}, // site key
 		}) {
 			out <- s.rec2comm(&t.Comment, rec)
@@ -58,7 +58,7 @@ func (s *HackerNews) ReadBoard(b *Board, rc io.Reader) <-chan *Thread {
 
 		rec1c := recsFromClasses(rcs[1], [][2]string{
 			{"rank", ""},
-			{"subtext", "attrs"},})
+			{"subtext", "attrs"}})
 		for rec0 := range recsFromClasses(rcs[0], [][2]string{
 			{"rank", ""}, // synchronize the stream on rank
 			{"title", ""},
@@ -74,7 +74,7 @@ func (s *HackerNews) ReadBoard(b *Board, rc io.Reader) <-chan *Thread {
 }
 
 func (s *HackerNews) rec2thr(b *Board, rec []string) *Thread {
-	subtext := strings.Split(rec[2]," ")
+	subtext := strings.Split(rec[2], " ")
 	// XXX this is kind of crummy in ls -l. Maybe I should randomize minutes
 	num_hours, _ := strconv.ParseInt(strings.Trim(subtext[12], "\n"), 10, 64)
 	hour_dur := time.Duration(time.Duration(num_hours) * time.Hour)
@@ -87,13 +87,13 @@ func (s *HackerNews) rec2thr(b *Board, rec []string) *Thread {
 		when:     when,
 		body:     rec[2],
 		parent:   nil,
-		site_key: site_key,}
+		site_key: site_key}
 	num_replies, _ := strconv.ParseInt(
 		strings.Trim(subtext[17], "\n"), 10, 64)
 	return newThread(b, comm, make([]*Comment, num_replies))
 }
 
-func (s* HackerNews) rec2comm(p *Comment, rec []string) *Comment {
+func (s *HackerNews) rec2comm(p *Comment, rec []string) *Comment {
 	rec1 := strings.Split(rec[1], " ")
 	num_hours, _ := strconv.ParseInt(strings.Trim(rec1[11], "\n"), 10, 64)
 	hour_dur := time.Duration(time.Duration(num_hours) * time.Hour)
@@ -104,10 +104,10 @@ func (s* HackerNews) rec2comm(p *Comment, rec []string) *Comment {
 	body = strings.Trim(body, "\n ")
 
 	return &Comment{
-		author: strings.Trim(rec1[10], "\n"),
-		title: "",
+		author:   strings.Trim(rec1[10], "\n"),
+		title:    "",
 		when:     when,
 		body:     body,
 		parent:   p,
-		site_key: "???",}
+		site_key: "???"}
 }

@@ -22,15 +22,15 @@ type Site struct {
 
 type siteInfo struct {
 	name string
-	init func() (*Site)
+	init func() *Site
 }
 
 var (
-	sites = []siteInfo {
-		siteInfo {name : "4chan", init : newRedditSite, },
-		siteInfo {name : "hackernews", init : newHackerNewsSite, },
-		siteInfo {name : "reddit", init : newRedditSite, },
-		siteInfo {name : "slashdot", init : newSlashdotSite, },
+	sites = []siteInfo{
+		siteInfo{name: "4chan", init: newRedditSite},
+		siteInfo{name: "hackernews", init: newHackerNewsSite},
+		siteInfo{name: "reddit", init: newRedditSite},
+		siteInfo{name: "slashdot", init: newSlashdotSite},
 	}
 )
 
