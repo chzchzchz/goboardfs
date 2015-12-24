@@ -1,25 +1,25 @@
 package board
 
 import (
-	"time"
 	"log"
+	"time"
 )
 
-const REFRESH_TIMEOUT float64 =  10 * 60.0
+const REFRESH_TIMEOUT float64 = 10 * 60.0
 
 type Board struct {
-	site		*Site
-	name		string
-	threads		[]*Thread
-	last_refresh	time.Time
+	site         *Site
+	name         string
+	threads      []*Thread
+	last_refresh time.Time
 }
 
 func newDefaultBoard(s *Site, n string) *Board {
 	return &Board{
-		site : s,
-		name : n,
-		threads : nil,
-		last_refresh : time.Unix(0, 0),
+		site:         s,
+		name:         n,
+		threads:      nil,
+		last_refresh: time.Unix(0, 0),
 	}
 }
 

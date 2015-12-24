@@ -1,29 +1,29 @@
 package board
 
 import (
+	"fmt"
 	"strings"
 	"time"
-	"fmt"
 )
 
 var (
-	niceXlateMap = map[string]string {
-		"&#039;" : "'",
-		"/" : "|",
-		"&quot;" : "\"",
-		"&lt;" : "<",
-		"&gt;" : ">",
+	niceXlateMap = map[string]string{
+		"&#039;": "'",
+		"/":      "|",
+		"&quot;": "\"",
+		"&lt;":   "<",
+		"&gt;":   ">",
 	}
 )
 
 type Comment struct {
-	parent	*Comment
-	author	string
-	when	time.Time
-	title	string
+	parent     *Comment
+	author     string
+	when       time.Time
+	title      string
 	nice_title *string
-	body	string
-	site_key string
+	body       string
+	site_key   string
 }
 
 func (c *Comment) String() string {

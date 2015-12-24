@@ -1,10 +1,10 @@
 package board
 
 import (
-	"strings"
-	"strconv"
-	"time"
 	"io"
+	"strconv"
+	"strings"
+	"time"
 )
 
 type FourChan struct {
@@ -12,7 +12,7 @@ type FourChan struct {
 }
 
 func newFourChanSite() *Site {
-	fc := &FourChan{ Site : *newDefaultSite("4chan" ) }
+	fc := &FourChan{Site: *newDefaultSite("4chan")}
 	fc.Browser = fc
 	return &fc.Site
 }
@@ -25,12 +25,12 @@ func (s *FourChan) OpenBoardReader(b *Board) (io.Reader, error) {
 	return httpReader("http://boards.4chan.org/" + b.name)
 }
 
-func (s* FourChan) OpenThreadReader(t *Thread) (io.Reader, error) {
+func (s *FourChan) OpenThreadReader(t *Thread) (io.Reader, error) {
 	return httpReader(
 		"http://boards.4chan.org/" + t.board.name + "/" + t.site_key)
 }
 
-func (s* FourChan) ReadThread(t *Thread, rc io.Reader) (<-chan *Comment) {
+func (s *FourChan) ReadThread(t *Thread, rc io.Reader) <-chan *Comment {
 	out := make(chan *Comment)
 	go func() {
 		for rec := range recsFromClasses(rc, [][2]string{
@@ -45,7 +45,7 @@ func (s* FourChan) ReadThread(t *Thread, rc io.Reader) (<-chan *Comment) {
 	return out
 }
 
-func (s *FourChan) ReadBoard(b * Board, rc io.Reader) <-chan *Thread {
+func (s *FourChan) ReadBoard(b *Board, rc io.Reader) <-chan *Thread {
 	out := make(chan *Thread)
 	go func() {
 		for rec := range recsFromClasses(rc, [][2]string{
@@ -62,7 +62,7 @@ func (s *FourChan) ReadBoard(b * Board, rc io.Reader) <-chan *Thread {
 	return out
 }
 
-func (s* FourChan) rec2thr(b *Board, rec []string) (*Thread) {
+func (s *FourChan) rec2thr(b *Board, rec []string) *Thread {
 	// no parent since root of thread
 	comm := s.rec2comm(nil, []string{rec[0], rec[2], rec[3]})
 	title := rec[1]
@@ -79,14 +79,14 @@ func (s* FourChan) rec2thr(b *Board, rec []string) (*Thread) {
 }
 
 // {id, date, message}
-func (s* FourChan) rec2comm(p *Comment, rec []string) (*Comment) {
+func (s *FourChan) rec2comm(p *Comment, rec []string) *Comment {
 	dateNum, _ := strconv.ParseInt(rec[1], 10, 64)
 	when := time.Unix(dateNum, 0)
 	return &Comment{
-		author : "Anonymous",
-		title : "",
-		when : when,
-		body : rec[2],
-		parent : p,
-		site_key : rec[0][3:len(rec)]}
+		author:   "Anonymous",
+		title:    "",
+		when:     when,
+		body:     rec[2],
+		parent:   p,
+		site_key: rec[0][3:len(rec)]}
 }

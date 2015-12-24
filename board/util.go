@@ -2,20 +2,20 @@ package board
 
 import (
 	"fmt"
+	"golang.org/x/net/html"
 	"io"
 	"io/ioutil"
 	"log"
-	"strings"
 	"net/http"
-	"golang.org/x/net/html"
+	"strings"
 )
 
 var (
 	closedChan chan []string
 )
 
-func getClosedChan() <-chan []string{
-	if closedChan == nil{
+func getClosedChan() <-chan []string {
+	if closedChan == nil {
 		closedChan = make(chan []string)
 		close(closedChan)
 	}
@@ -35,7 +35,6 @@ func httpReader(url string) (io.Reader, error) {
 	return strings.NewReader(string(body)), err
 }
 
-
 func dupReader(rc io.Reader) (rcs [2]io.Reader, _ error) {
 	body, err := ioutil.ReadAll(rc)
 	if err != nil {
@@ -46,7 +45,7 @@ func dupReader(rc io.Reader) (rcs [2]io.Reader, _ error) {
 	return rcs, nil
 }
 
-func recsFromClasses(rc io.Reader, matchClasses [][2]string)  <-chan []string {
+func recsFromClasses(rc io.Reader, matchClasses [][2]string) <-chan []string {
 	out, err := newRecChan(rc, matchClasses)
 	if err != nil {
 		log.Println("err: ", err)
@@ -63,7 +62,7 @@ func newParseChan(rc io.Reader) (<-chan *html.Node, error) {
 	return newNodeChan(doc), nil
 }
 
-func newNodeChan(doc *html.Node) (<-chan *html.Node) {
+func newNodeChan(doc *html.Node) <-chan *html.Node {
 	out := make(chan *html.Node)
 	var f func(*html.Node)
 	f = func(n *html.Node) {
@@ -79,7 +78,7 @@ func newNodeChan(doc *html.Node) (<-chan *html.Node) {
 	return out
 }
 
-func newRecChan(rc io.Reader, classes[][2]string) (<-chan []string, error) {
+func newRecChan(rc io.Reader, classes [][2]string) (<-chan []string, error) {
 	nc, err := newParseChan(rc)
 	if err != nil {
 		return nil, err
@@ -141,7 +140,7 @@ func matchRec(nodec <-chan *html.Node, classes [][2]string) (rec []string) {
 			if isClassMatch(n, classes[i][0]) {
 				attr := findAttr(n, classes[i][1])
 				rec = append(rec, attr)
-				break;
+				break
 			}
 		}
 		if len(rec)-1 != i {

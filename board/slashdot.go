@@ -1,11 +1,11 @@
 package board
 
 import (
-	"time"
-	"log"
-	"strings"
-	"strconv"
 	"io"
+	"log"
+	"strconv"
+	"strings"
+	"time"
 )
 
 type Slashdot struct {
@@ -13,7 +13,7 @@ type Slashdot struct {
 }
 
 func newSlashdotSite() *Site {
-	rs := &Slashdot{ Site : *newDefaultSite("slashdot" ) }
+	rs := &Slashdot{Site: *newDefaultSite("slashdot")}
 	rs.Browser = rs
 	return &rs.Site
 }
@@ -30,7 +30,7 @@ func (s *Slashdot) OpenThreadReader(t *Thread) (io.Reader, error) {
 	return httpReader("http:" + t.site_key)
 }
 
-func (s *Slashdot) ReadBoard(b *Board, rc io.Reader) (<-chan *Thread) {
+func (s *Slashdot) ReadBoard(b *Board, rc io.Reader) <-chan *Thread {
 	out := make(chan *Thread)
 	go func() {
 		defer close(out)
@@ -45,9 +45,9 @@ func (s *Slashdot) ReadBoard(b *Board, rc io.Reader) (<-chan *Thread) {
 				{"story-title", ""},
 				{"comment-bubble", ""},
 				{"story-byline", ""},
-				{"body", ""},}),
+				{"body", ""}}),
 			recsFromClasses(rcs[1], [][2]string{
-				{"story-title", "attrs"},}),
+				{"story-title", "attrs"}}),
 		}
 
 		for {
@@ -63,7 +63,7 @@ func (s *Slashdot) ReadBoard(b *Board, rc io.Reader) (<-chan *Thread) {
 	return out
 }
 
-func (s* Slashdot) ReadThread(t *Thread, rc io.Reader) (<-chan *Comment) {
+func (s *Slashdot) ReadThread(t *Thread, rc io.Reader) <-chan *Comment {
 	out := make(chan *Comment)
 	go func() {
 		for rec := range recsFromClasses(rc, [][2]string{
@@ -84,7 +84,7 @@ func slashdot2time(s string) (time.Time, error) {
 	return time.Parse(timeTitleFmt, s)
 }
 
-func (s *Slashdot) rec2thr(b *Board, rec []string) (*Thread) {
+func (s *Slashdot) rec2thr(b *Board, rec []string) *Thread {
 	title := strings.Join(strings.Fields(rec[0]), " ")
 	num_comments, _ := strconv.ParseInt(rec[1], 10, 64)
 	author := strings.Fields(rec[2])[2]
@@ -93,15 +93,15 @@ func (s *Slashdot) rec2thr(b *Board, rec []string) (*Thread) {
 	return newThread(
 		b,
 		&Comment{
-			author : author,
-			title : title,
-			when : when,
-			site_key : site_key,
-			},
+			author:   author,
+			title:    title,
+			when:     when,
+			site_key: site_key,
+		},
 		make([]*Comment, num_comments))
 }
 
-func (s *Slashdot) rec2comm(parent *Comment, rec []string) (*Comment) {
+func (s *Slashdot) rec2comm(parent *Comment, rec []string) *Comment {
 	on_split := strings.Split(rec[2], "on ")
 	when := parent.when
 	if len(on_split) > 1 {
@@ -115,10 +115,10 @@ func (s *Slashdot) rec2comm(parent *Comment, rec []string) (*Comment) {
 		}
 	}
 	return &Comment{
-		parent : parent,
-		author : strings.Fields(rec[1])[1],
-		title : strings.Split(rec[0], "\n")[0],
-		when : when,
-		body : rec[3],
-		}
+		parent: parent,
+		author: strings.Fields(rec[1])[1],
+		title:  strings.Split(rec[0], "\n")[0],
+		when:   when,
+		body:   rec[3],
+	}
 }

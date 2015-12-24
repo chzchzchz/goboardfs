@@ -1,8 +1,8 @@
 package board
 
 import (
-	"log"
 	"io"
+	"log"
 )
 
 type Browser interface {
@@ -15,9 +15,9 @@ type Browser interface {
 
 type Site struct {
 	Browser
-	name		string
-	list_boards	[]string // cached ListBoards
-	boards		map[string]*Board
+	name        string
+	list_boards []string // cached ListBoards
+	boards      map[string]*Board
 }
 
 // create board by name
@@ -69,6 +69,6 @@ func (s *Site) List() []string {
 
 func newDefaultSite(n string) *Site {
 	return &Site{
-		name : n,
-		boards : make(map[string]*Board) }
+		name:   n,
+		boards: make(map[string]*Board)}
 }

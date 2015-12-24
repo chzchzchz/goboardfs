@@ -1,25 +1,25 @@
 package board
 
 import (
-	"time"
 	"fmt"
 	"log"
+	"time"
 )
 
 // root comment
 type Thread struct {
-	board		*Board
+	board *Board
 	Comment
-	comments	[]*Comment
-	last_refresh	time.Time
+	comments     []*Comment
+	last_refresh time.Time
 }
 
-func newThread(b *Board, first *Comment, comms []*Comment) (*Thread) {
+func newThread(b *Board, first *Comment, comms []*Comment) *Thread {
 	return &Thread{
-		board : b,
-		Comment : *first,
-		comments : comms,
-		last_refresh : time.Unix(0, 0),
+		board:        b,
+		Comment:      *first,
+		comments:     comms,
+		last_refresh: time.Unix(0, 0),
 	}
 }
 

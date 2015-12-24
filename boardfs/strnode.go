@@ -11,17 +11,17 @@ type StrNode struct {
 	s string
 }
 
-func newStrNode(in_s string) (*StrNode) {
+func newStrNode(in_s string) *StrNode {
 	return &StrNode{
-		Node : nodefs.NewDefaultNode(),
-		s : in_s}
+		Node: nodefs.NewDefaultNode(),
+		s:    in_s}
 }
 
 func (sn *StrNode) Open(flags uint32, context *fuse.Context) (nodefs.File, fuse.Status) {
 	return nodefs.NewDataFile([]byte(sn.s)), fuse.OK
 }
 
-func (sn* StrNode) GetAttr(
+func (sn *StrNode) GetAttr(
 	out *fuse.Attr,
 	file nodefs.File,
 	context *fuse.Context) (code fuse.Status) {

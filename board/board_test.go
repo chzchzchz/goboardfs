@@ -1,9 +1,9 @@
 package board
 
 import (
+	"os"
 	"testing"
 	"time"
-	"os"
 )
 
 func doTestRefreshBoard(t *testing.T, s *Site, fname string, expected_c uint) {
@@ -36,7 +36,7 @@ func doTestRefreshThread(t *testing.T, s *Site, fname string) {
 		return
 	}
 
-	thr := newThread(nil, &Comment{ when : time.Now() }, nil)
+	thr := newThread(nil, &Comment{when: time.Now()}, nil)
 	c_c := 0
 	for c := range s.Browser.ReadThread(thr, rc) {
 		if c.when.Year() < 2015 {

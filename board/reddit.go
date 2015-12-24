@@ -1,10 +1,10 @@
 package board
 
 import (
+	"io"
+	"strconv"
 	"strings"
 	"time"
-	"strconv"
-	"io"
 )
 
 type Reddit struct {
@@ -12,7 +12,7 @@ type Reddit struct {
 }
 
 func newRedditSite() *Site {
-	rs := &Reddit{ Site : *newDefaultSite("reddit" ) }
+	rs := &Reddit{Site: *newDefaultSite("reddit")}
 	rs.Browser = rs
 	return &rs.Site
 }
@@ -29,7 +29,7 @@ func (s *Reddit) OpenThreadReader(t *Thread) (io.Reader, error) {
 	return httpReader(t.site_key)
 }
 
-func (s *Reddit) ReadBoard(b *Board, rc io.Reader) (<-chan *Thread) {
+func (s *Reddit) ReadBoard(b *Board, rc io.Reader) <-chan *Thread {
 	out := make(chan *Thread)
 	go func() {
 		defer close(out)
@@ -39,14 +39,14 @@ func (s *Reddit) ReadBoard(b *Board, rc io.Reader) (<-chan *Thread) {
 		}
 
 		recc := [2]<-chan []string{
-			recsFromClasses(rcs[0], [][2]string {
+			recsFromClasses(rcs[0], [][2]string{
 				{"title may-blank", ""},
 				{"live-timestamp", "title"},
 				{"author may-blank", ""},
-				{"comments may-blank", ""},}),
+				{"comments may-blank", ""}}),
 			// to get the site key ugh
-			recsFromClasses(rcs[1], [][2]string {
-				{"comments may-blank", "href"},}),
+			recsFromClasses(rcs[1], [][2]string{
+				{"comments may-blank", "href"}}),
 		}
 		for {
 			rec1, r0_ok := <-recc[0]
@@ -61,7 +61,7 @@ func (s *Reddit) ReadBoard(b *Board, rc io.Reader) (<-chan *Thread) {
 	return out
 }
 
-func (s* Reddit) ReadThread(t *Thread, rc io.Reader) (<-chan *Comment) {
+func (s *Reddit) ReadThread(t *Thread, rc io.Reader) <-chan *Comment {
 	out := make(chan *Comment)
 	go func() {
 		for rec := range recsFromClasses(rc, [][2]string{
@@ -82,30 +82,30 @@ func reddit2time(s string) time.Time {
 	return when
 }
 
-func (s *Reddit) rec2comm(parent *Comment, rec []string) (*Comment) {
+func (s *Reddit) rec2comm(parent *Comment, rec []string) *Comment {
 	return &Comment{
-		parent : parent,
-		author : rec[0],
-		title : "",
-		when : reddit2time(rec[1]),
-		body : rec[2],
-		}
+		parent: parent,
+		author: rec[0],
+		title:  "",
+		when:   reddit2time(rec[1]),
+		body:   rec[2],
+	}
 }
 
-func (s *Reddit) rec2thr(b *Board, rec []string) (*Thread) {
+func (s *Reddit) rec2thr(b *Board, rec []string) *Thread {
 	num_comments := 0
 	if !strings.Contains(rec[3], "empty") {
 		v := strings.Split(rec[3], " ")[0]
-		n , _ := strconv.ParseInt(v, 10, 32)
+		n, _ := strconv.ParseInt(v, 10, 32)
 		num_comments = int(n)
 	}
 	return newThread(
 		b,
 		&Comment{
-			author : rec[2],
-			title : rec[0],
-			when : reddit2time(rec[1]),
-			site_key : rec[4],
-			},
+			author:   rec[2],
+			title:    rec[0],
+			when:     reddit2time(rec[1]),
+			site_key: rec[4],
+		},
 		make([]*Comment, num_comments))
 }
