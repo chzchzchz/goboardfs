@@ -20,23 +20,44 @@ type Site struct {
 	boards      map[string]*Board
 }
 
+type siteInfo struct {
+	name string
+	init func() (*Site)
+}
+
+var (
+	sites = []siteInfo {
+		siteInfo {name : "4chan", init : newRedditSite, },
+		siteInfo {name : "hackernews", init : newHackerNewsSite, },
+		siteInfo {name : "reddit", init : newRedditSite, },
+		siteInfo {name : "slashdot", init : newSlashdotSite, },
+	}
+)
+
+func siteByName(name string) (s *Site) {
+	for i := range sites {
+		if sites[i].name == name {
+			return sites[i].init()
+		}
+	}
+	return nil
+}
+
+func Sites() (v []string) {
+	for i := range sites {
+		v = append(v, sites[i].name)
+	}
+	return v
+}
+
 // create board by name
 func NewSite(name string) (s *Site) {
-	switch {
-	case name == "reddit":
-		s = newRedditSite()
-	case name == "4chan":
-		s = newFourChanSite()
-	case name == "slashdot":
-		s = newSlashdotSite()
-	}
-
+	s = siteByName(name)
 	if s != nil {
 		s.list_boards = s.Browser.BoardDirectory()
 	} else {
 		log.Println("no board for " + name)
 	}
-
 	return s
 }
 

@@ -25,5 +25,5 @@ func (rn *RootNode) NodeFromName(name string) (nodefs.Node, error) {
 }
 
 func (rn *RootNode) List() []string {
-	return []string{"reddit", "4chan", "slashdot"}
+	return board.Sites()
 }
